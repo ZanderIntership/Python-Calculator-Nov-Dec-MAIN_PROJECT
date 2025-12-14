@@ -4,28 +4,69 @@ root = tk.Tk()
 root.title("Calculator Application")
 root.geometry("400x600")
 
+total = 0.0
+has_total = False  # indicates whether total has been initialized
 
-def get_values():
-    """Read the two entries and convert to float."""
+def read_entries():
+    """Return (v1, v2) as floats or raise ValueError."""
     v1 = float(Value1Entry.get())
     v2 = float(Value2Entry.get())
     return v1, v2
 
-def add():
-    v1,v2 = get_values()
-    output_label.config(text=str(v1 + v2))
+def show_total():
+    output_label.config(text=str(total))
 
-def Minus():
-    v1, v2 = get_values()
-    output_label.config(text=str(v1 - v2))
+def add():
+    global total, has_total
+    v1, v2 = read_entries()
+    if not has_total:
+        total = v1 + v2
+        has_total = True
+    else:
+        total = total + v2
+    show_total()
+
+def minus():
+    global total, has_total
+    v1, v2 = read_entries()
+    if not has_total:
+        total = v1 - v2
+        has_total = True
+    else:
+        total = total - v2
+    show_total()
 
 def multiply():
-    v1, v2 = get_values()
-    output_label.config(text=str(v1 * v2))
+    global total, has_total
+    v1, v2 = read_entries()
+    if not has_total:
+        total = v1 * v2
+        has_total = True
+    else:
+        total = total * v2
+    show_total()
 
 def division():
-    v1, v2 = get_values()
-    output_label.config(text=str(v1 / v2))
+    global total, has_total
+    v1, v2 = read_entries()
+    if v2 == 0:
+        output_label.config(text="Cannot divide by 0")
+        return
+
+    if not has_total:
+        total = v1 / v2
+        has_total = True
+    else:
+        total = total / v2
+    show_total()
+
+def clear():
+    global total, has_total
+    total = 0.0
+    has_total = False
+    output_label.config(text="")
+
+# ----- UI -----
 
 input_frame = tk.Frame(root)
 input_frame.pack(pady=10)
@@ -45,23 +86,16 @@ Value2Entry.grid(row=1, column=1, sticky="w", padx=5)
 btnFrame = tk.Frame(root)
 btnFrame.pack(pady=10)
 
-addBtn = tk.Button(btnFrame, text="+", command=add)
-addBtn.grid(row=2, column=0, sticky="w", padx=5, )
-
-MinusBtn = tk.Button(btnFrame, text="-", command=Minus)
-MinusBtn.grid(row=2, column=1, sticky="w", padx=5)
-
-DevisionBtn = tk.Button(btnFrame, text="%", command=division)
-DevisionBtn.grid(row=2, column=2, sticky="w", padx=5)
-
-MultiplyBtn = tk.Button(btnFrame, text="*", command=multiply)
-MultiplyBtn.grid(row=2, column=3, sticky="w", padx=5)
+tk.Button(btnFrame, text="+", command=add).grid(row=2, column=0, padx=15)
+tk.Button(btnFrame, text="-", command=minus).grid(row=2, column=1, padx=15)
+tk.Button(btnFrame, text="/", command=division).grid(row=2, column=2, padx=15)
+tk.Button(btnFrame, text="*", command=multiply).grid(row=2, column=3, padx=15)
+tk.Button(btnFrame, text="C", command=clear).grid(row=2, column=4, padx=15)
 
 output_frame = tk.Frame(root)
 output_frame.pack(side="bottom", pady=20)
 
-output_label_title = tk.Label(output_frame, text="Output", font=("Arial", 12))
-output_label_title.pack()
+tk.Label(output_frame, text="Output", font=("Arial", 12)).pack()
 
 output_label = tk.Label(
     output_frame,
@@ -73,10 +107,5 @@ output_label = tk.Label(
     anchor="center"
 )
 output_label.pack(pady=5)
-
-
-
-
-
 
 root.mainloop()
